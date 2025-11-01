@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  libretranslate:
+    container_name: libretranslate
+    image: libretranslate/libretranslate:latest
+#    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - LT_UPDATE_MODELS=true
+      - LT_LOAD_ONLY=en,pt
+      - LT_THREADS=4
+    volumes:
+      - libretranslate_data:/home/libretranslate/.local
+    healthcheck:
+      test: ['CMD-SHELL', './venv/bin/python scripts/healthcheck.py']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - legendas_network
+
+  legendas:
+    container_name: legendas
+    image: python:3.9-slim
+    depends_on:
+      libretranslate:
+        condition: service_healthy
+    volumes:
+      - /dados/dockers/legendas:/app
+      - /dados/movies:/movies
+      - /dados/tv:/tv
+      - /dados/downloads/temp:/temp
+    environment:
+      - TZ=America/Sao_Paulo
+      - TRANSLATE_API_URL=http://libretranslate:5000/translate
+    working_dir: /app
+    command: bash -c "apt-get update && apt-get install -y ffmpeg mkvtoolnix && pip install requests pysrt tqdm python-dotenv && python /app/translate_subtitles.py"
+    networks:
+      - legendas_network
+
+volumes:
+  libretranslate_data:
+
+networks:
+  legendas_network:
+    driver: bridge
