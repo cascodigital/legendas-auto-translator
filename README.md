@@ -89,19 +89,6 @@ Adicione as linhas:
 - Domingo as 04:00: Para containers e libera memoria/recursos
 - Volume de modelos e preservado (nao precisa baixar novamente)
 
-### Outras Opcoes de Agendamento
-
-Apenas aos sabados as 02:00:
-```bash
-0 2 * * 6 cd /caminho/para/legendas-auto-translator && /usr/bin/docker compose up -d
-0 3 * * 6 cd /caminho/para/legendas-auto-translator && /usr/bin/docker compose down
-```
-
-Com registro de logs:
-```bash
-0 3 * * * cd /caminho/para/legendas-auto-translator && /usr/bin/docker compose up -d >> /var/log/legendas-cron.log 2>&1
-```
-
 ### Verificar crontab configurado
 
 ```bash
